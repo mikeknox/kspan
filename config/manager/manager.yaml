@@ -19,8 +19,8 @@ spec:
       - command:
         - /manager
         args:
-        - --otlp-addr=otel-collector.default:4317
-        image: weaveworks/kspan:main-12eefbe6
+        - --otlp-addr=jaeger-collector.default:4317
+        image: kspan
         name: manager
         resources:
           limits:

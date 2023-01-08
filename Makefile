@@ -2,7 +2,7 @@
 # Image URL to use all building/pushing image targets
 IMG ?= weaveworks/kspan:dev
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true"
+CRD_OPTIONS ?= "crd"
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -51,16 +51,24 @@ vet:
 	go vet ./...
 
 # Generate code
-generate: controller-gen
+generate: boilerplate controller-gen
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Build the docker image
-docker-build: test
+docker-build:
 	docker build . -t ${IMG}
 
-# Push the docker image
+# Push the docker images
 docker-push: docker-build
 	docker push ${IMG}
+
+# find or download boilerplate
+boilerplate:
+	@{ \
+		mkdir -p hack ; \
+	  cd hack ; \
+	  wget -q https://github.com/kubernetes/code-generator/blob/081720d0e25600f84cd4b1018364fa61c362a838/hack/boilerplate.go.txt ;\
+	}
 
 # find or download controller-gen
 # download controller-gen if necessary
@@ -71,7 +79,7 @@ ifeq (, $(shell which controller-gen))
 	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
 	cd $$CONTROLLER_GEN_TMP_DIR ;\
 	go mod init tmp ;\
-	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.5 ;\
+	go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.10.0 ;\
 	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
 	}
 CONTROLLER_GEN=$(GOBIN)/controller-gen

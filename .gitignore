@@ -16,9 +16,12 @@ bin
 # Kubernetes Generated files - skip generated files, except for vendored files
 
 !vendor/**/zz_generated.*
+hack/
 
 # editor and IDE paraphernalia
 .idea
 *.swp
 *.swo
 *~
+
+docker_mirror_*
